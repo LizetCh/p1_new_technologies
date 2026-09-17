@@ -2,3 +2,6 @@
 .DS_Store
 docker-compose.yml
 .env
+
+# Python 
+__pycache__/
