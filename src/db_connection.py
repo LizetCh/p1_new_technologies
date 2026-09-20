@@ -38,12 +38,6 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 # BASE_DIR points to the root folder of the project.
-# Example:
-# If this file is located at:
-# hospital_analytics_project/src/db_connection.py
-#
-# Then BASE_DIR will be:
-# hospital_analytics_project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Path to the .env file located at the project root.
@@ -58,11 +52,11 @@ load_dotenv(ENV_PATH)
 # ============================================================
 
 # Read database connection values from environment variables.
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER") or os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD") or os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("DB_HOST", "postgres_db")
 DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME")
+DB_NAME = os.getenv("DB_NAME") or os.getenv("POSTGRES_DB")
 
 
 def validate_database_variables() -> None:
@@ -125,6 +119,7 @@ def get_database_url() -> URL:
         host=DB_HOST,
         port=int(DB_PORT),
         database=DB_NAME,
+        query={"sslmode": "disable"}  # <-- AQUÍ SE DESACTIVA EL SSL PARA DOCKER
     )
 
 
@@ -168,10 +163,6 @@ def test_connection() -> None:
 # Script entry point
 # ============================================================
 
-# This allows students to run:
-# python src/db_connection.py
-#
-# If the connection is correct, they will see a success message.
 if __name__ == "__main__":
     try:
         test_connection()

@@ -26,6 +26,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
+
 def run_pipeline() -> None:
     """
     Run the full data pipeline.
@@ -47,7 +49,8 @@ def run_pipeline() -> None:
 
     logger.info("Full pipeline completed successfully.")
 
-    # ============================================================
+
+# ============================================================
 # Script entry point
 # ============================================================
 

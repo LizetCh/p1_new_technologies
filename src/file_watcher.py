@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_DATA_DIR = BASE_DIR / "data" / "raw"
+
+
 # ============================================================
 # File watcher handler
 # ============================================================
@@ -117,6 +119,7 @@ class NewCSVFileHandler(FileSystemEventHandler):
 
         finally:
             self.is_pipeline_running = False
+
 
 # ============================================================
 # Main watcher function

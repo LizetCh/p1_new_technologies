@@ -35,6 +35,8 @@ logging.basicConfig(
 # Create a logger for this file.
 logger = logging.getLogger(__name__)
 
+
+
 # ============================================================
 # Database connection
 # ============================================================
@@ -58,11 +60,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # RAW_DATA_DIR points to the folder where raw CSV files are stored.
 # Expected structure:
-# data/raw/patients/
-# data/raw/doctors/
-# data/raw/appointments/
-# data/raw/treatments/
-# data/raw/billing/
+# data/raw/orders_medium/
+# TODO: Agregar la carpeta de raw para los otros CSVs
 RAW_DATA_DIR = BASE_DIR / "data" / "raw"
 
 # ============================================================
@@ -78,12 +77,19 @@ RAW_DATA_DIR = BASE_DIR / "data" / "raw"
 # CSV files in data/raw/appointments/
 # will be loaded into raw.appointments
 SOURCES = {
-    "customers": {
-    "folder": RAW_DATA_DIR / "customers",
-    "schema": "raw",
-    "table": "customers",
+    "orders_medium": {
+        "folder": RAW_DATA_DIR / "orders_medium",
+        "schema": "raw",
+        "table": "orders_medium",
     },
+    "customers_medium": {
+        "folder": RAW_DATA_DIR / "customers_medium",
+        "schema": "raw",
+        "table": "customers_medium",
+    },
+    # TODO: Agregar match para otras carpetas de raw y sus tablas correspondientes
 }
+
 
 # ============================================================
 # Helper functions
@@ -106,7 +112,6 @@ def get_relative_path(file_path: Path) -> str:
     """
     return str(file_path.relative_to(BASE_DIR))
 
-
 def get_csv_files(folder_path: Path) -> list[Path]:
     """
     Return all CSV files from a folder.
@@ -127,7 +132,6 @@ def get_csv_files(folder_path: Path) -> list[Path]:
     # Find all files ending in .csv inside the folder.
     # sorted() makes the loading order predictable.
     return sorted(folder_path.glob("*.csv"))
-
 
 def file_was_processed(file_path: Path) -> bool:
     """
@@ -245,7 +249,6 @@ def log_ingestion(
                 "error_message": error_message,
             }
         )
-
 
 def load_csv_to_raw_table(
     file_path: Path,

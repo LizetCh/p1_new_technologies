@@ -1,20 +1,7 @@
-/.env
-
-# Python cache files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# Streamlit secrets
-.streamlit/secrets.toml
-
-# Logs
-*.log
-
-# OS files
+.vscode
 .DS_Store
-Thumbs.db
+docker-compose.yml
+.env
+
+# Python 
+__pycache__/
