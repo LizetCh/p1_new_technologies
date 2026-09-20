@@ -88,6 +88,7 @@ def load_cancelled_delivered_orders() -> pd.DataFrame:
         FROM analytics.vw_delivery_performance
         GROUP BY restaurant_id
         HAVING (SUM(is_delivered) + SUM(is_late)) >= 10
+        ORDER BY SUM(is_late)::numeric/(SUM(is_delivered) + SUM(is_late)) DESC
         LIMIT 10;
     """
 
@@ -105,7 +106,7 @@ st.title("Restaurant Analytics Dashboard")
 st.caption("Simple analytics dashboard powered by PostgreSQL and Streamlit.")
 
 # ---- 1. Peak Days of the Week by total orders ----
-st.subheader("Peak Days of the Week by total orders")
+st.subheader("Top Days of the Week by Total Orders")
 
 peak_days_of_week_df = load_peak_days_of_week()
 
@@ -133,7 +134,7 @@ else:
 
 
 # ------ 2. Delivered and Late Orders per Restaurant ----
-st.subheader("Delivered and Late Orders per Restaurant")
+st.subheader("Top 10 Restaurants: Late vs Delivered Orders")
 
 cancelled_delivered_orders_df = load_cancelled_delivered_orders()
 
@@ -142,12 +143,13 @@ if cancelled_delivered_orders_df.empty:
 else:
     # stacked bar
     fig = px.bar(
-    cancelled_delivered_orders_df,
-    y="restaurant_id",
-    x=["delivered", "late"],
-    title="Delivered vs. Late Orders Ratio per Restaurant",
-    orientation="h",
-    color_discrete_map={"delivered": "#1f77b4", "late": "#ff7f0e"},
+        cancelled_delivered_orders_df,
+        y="restaurant_id",
+        x=["late", "delivered"],
+        title="Top 10 Restaurants: Late vs Delivered Orders",
+        orientation="h",
+        text_auto=True,
+        color_discrete_map={"delivered": "#1f77b4", "late": "#ff7f0e"},
     )
 
     # Force 100% stacked bar layout (0.0 to 1.0)
@@ -157,7 +159,10 @@ else:
         xaxis_title="Proportion",
         yaxis_title="Restaurant ID",
         legend_title_text="Status",
+        xaxis_tickformat=".0%"
     )
+
+    fig.update_yaxes(autorange="reversed")  #highest late ratio on top
 
     st.plotly_chart(fig, use_container_width=True)
 
