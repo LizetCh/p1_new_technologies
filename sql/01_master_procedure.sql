@@ -7,6 +7,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     CALL automation.sp_transform_orders_medium();
+    CALL automation.sp_transform_restaurants();
     -- TODO: Agregar otros procedimientos de transformación aquí
 END;
 $$;

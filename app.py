@@ -183,7 +183,8 @@ def load_restaurant_summary() -> pd.DataFrame:
             COUNT(*) AS total_restaurants
         FROM analytics.vw_restaurants_summary
         GROUP BY cuisine, city
-        ORDER BY total_restaurants DESC;
+        ORDER BY total_restaurants DESC
+        LIMIT 10;
     """
     logger.info("Loading data from analytics.vw_restaurants_summary")
     with engine.connect() as conn:
