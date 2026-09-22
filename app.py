@@ -167,3 +167,47 @@ else:
     st.plotly_chart(fig, use_container_width=True)
 
     st.dataframe(cancelled_delivered_orders_df, use_container_width=True)
+
+
+    # ============================================================
+# Restaurant Summary Data Loading
+# ============================================================
+
+@st.cache_data(ttl=600)
+def load_restaurant_summary() -> pd.DataFrame:
+    query = """
+        SELECT 
+            cuisine,
+            city,
+            AVG(rating) AS avg_rating,
+            COUNT(*) AS total_restaurants
+        FROM analytics.vw_restaurants_summary
+        GROUP BY cuisine, city
+        ORDER BY total_restaurants DESC;
+    """
+    logger.info("Loading data from analytics.vw_restaurants_summary")
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
+
+# ============================================================
+# Add to your Dashboard Layout section
+# ============================================================
+
+st.subheader("Restaurant Summary by Cuisine and City")
+
+restaurant_summary_df = load_restaurant_summary()
+
+if restaurant_summary_df.empty:
+    st.warning("No data available. Run the pipeline first.")
+else:
+    fig_restaurants = px.bar(
+        restaurant_summary_df.head(10),
+        x="cuisine",
+        y="total_restaurants",
+        color="city",
+        title="Top Cuisines and Locations",
+        text_auto=True
+    )
+    
+    st.plotly_chart(fig_restaurants, use_container_width=True)
+    st.dataframe(restaurant_summary_df, use_container_width=True)
