@@ -78,15 +78,19 @@ RAW_DATA_DIR = BASE_DIR / "data" / "raw"
 # Example:
 # CSV files in data/raw/appointments/
 # will be loaded into raw.appointments
+
 SOURCES = {
     "orders_medium": {
         "folder": RAW_DATA_DIR / "orders_medium",
         "schema": "raw",
         "table": "orders_medium",
     },
-    # TODO: Agregar match para otras carpetas de raw y sus tablas correspondientes
+    "order_items": {
+        "folder": RAW_DATA_DIR / "order_items",
+        "schema": "raw",
+        "table": "order_items",
+    },
 }
-
 
 # ============================================================
 # Helper functions
