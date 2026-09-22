@@ -85,10 +85,6 @@ SELECT
     order_time,
     delivery_time,
     status,
-    -- Split date and hour 
-    CAST(delivery_time AS DATE) AS order_date,
-    CAST(delivery_time AS TIME) AS order_clock_time,
-    TRIM(TO_CHAR(delivery_time, 'HH24')) AS order_hour,
     -- Day of the week
     TRIM(TO_CHAR(order_time, 'Day')) AS order_day_of_week,
     -- status flags
@@ -97,5 +93,6 @@ SELECT
     CASE WHEN TRIM(status) = 'Cancelled' THEN 1 ELSE 0 END AS is_cancelled
 FROM harmonized.orders_medium;
 
+DROP VIEW IF EXISTS analytics.vw_delivery_performance;
 
 SELECT * FROM analytics.vw_delivery_performance LIMIT 15;

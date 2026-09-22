@@ -87,6 +87,11 @@ SOURCES = {
         "schema": "raw",
         "table": "customers_medium",
     },
+    "restaurants": {
+    "folder": RAW_DATA_DIR / "restaurants",
+    "schema": "raw",
+    "table": "restaurants",
+    },
     # TODO: Agregar match para otras carpetas de raw y sus tablas correspondientes
 }
 
