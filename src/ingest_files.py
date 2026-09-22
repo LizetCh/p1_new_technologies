@@ -21,7 +21,6 @@ from sqlalchemy.exc import SQLAlchemyError
 # The credentials are handled in src/db_connection.py using the .env file.
 from db_connection import get_engine
 
-
 # ============================================================
 # Logging configuration
 # ============================================================
@@ -45,7 +44,6 @@ logger = logging.getLogger(__name__)
 # Create a reusable SQLAlchemy engine.
 # This engine is used by pandas and SQLAlchemy to connect to PostgreSQL.
 engine = get_engine()
-
 
 # ============================================================
 # Project folders
@@ -83,6 +81,16 @@ SOURCES = {
         "folder": RAW_DATA_DIR / "orders_medium",
         "schema": "raw",
         "table": "orders_medium",
+    },
+    "customers_medium": {
+        "folder": RAW_DATA_DIR / "customers_medium",
+        "schema": "raw",
+        "table": "customers_medium",
+    },
+    "restaurants": {
+    "folder": RAW_DATA_DIR / "restaurants",
+    "schema": "raw",
+    "table": "restaurants",
     },
     # TODO: Agregar match para otras carpetas de raw y sus tablas correspondientes
 }

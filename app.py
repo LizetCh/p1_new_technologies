@@ -96,6 +96,35 @@ def load_cancelled_delivered_orders() -> pd.DataFrame:
 
     with engine.connect() as conn:
         return pd.read_sql(query,conn)
+    
+# --------- 3. Customers by city --------
+@st.cache_data(ttl=600)
+def load_customers_by_city() -> pd.DataFrame:
+    query = """
+        SELECT 
+            city,
+            total_customers
+        FROM analytics.vw_customers_by_city;
+    """
+    logger.info("Loading data from analytics.vw_customers_by_city")
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
+
+# --------- 4. Customer signups by month --------
+@st.cache_data(ttl=600)
+def load_customer_signups_by_month() -> pd.DataFrame:
+    query = """
+        SELECT 
+            signup_year,
+            signup_month_number,
+            signup_month_name,
+            total_signups
+        FROM analytics.vw_customer_signups_by_month
+        ORDER BY signup_year, signup_month_number;
+    """
+    logger.info("Loading data from analytics.vw_customer_signups_by_month")
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
 
 
 # ============================================================
@@ -169,7 +198,67 @@ else:
     st.dataframe(cancelled_delivered_orders_df, use_container_width=True)
 
 
-    # ============================================================
+# ------ 3. Customer by City ----
+st.subheader("Customers by City")
+
+customers_by_city_df = load_customers_by_city()
+
+if customers_by_city_df.empty:
+    st.warning("No data available. Run the pipeline first.")
+
+else:
+    total_customers = customers_by_city_df["total_customers"].sum()
+
+    st.metric(
+        label="Total customers",
+        value=int(total_customers)
+    )
+
+    fig = px.bar(
+        customers_by_city_df,
+        x="city",
+        y="total_customers",
+        text="total_customers",
+        title="Customers by city"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.dataframe(customers_by_city_df, use_container_width=True)
+
+# ------ 4. Customer signups by month ----
+st.subheader("Customer Signups by Month")
+
+signups_by_month_df = load_customer_signups_by_month()
+
+if signups_by_month_df.empty:
+    st.warning("No data available. Run the pipeline first.")
+
+else:
+    signups_by_month_df["month_label"] = (
+        signups_by_month_df["signup_month_name"]
+        + " "
+        + signups_by_month_df["signup_year"].astype(str)
+    )
+
+    fig_line = px.line(
+        signups_by_month_df,
+        x="month_label",
+        y="total_signups",
+        markers=True,
+        title="Customer signups by month"
+    )
+
+    fig_line.update_xaxes(
+        categoryorder="array",
+        categoryarray=signups_by_month_df["month_label"]
+    )
+
+    st.plotly_chart(fig_line, use_container_width=True)
+
+    st.dataframe(signups_by_month_df, use_container_width=True)
+
+# ============================================================
 # Restaurant Summary Data Loading
 # ============================================================
 
