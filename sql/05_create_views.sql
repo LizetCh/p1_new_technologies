@@ -11,7 +11,7 @@ SELECT
 FROM raw.orders AS o
 JOIN raw.restaurants AS r ON o.restaurant_id = r.restaurant_id;
 
---tipos de cocina más populares--
+--
 SELECT 
     restaurant_cuisine,
     COUNT(order_id) AS total_orders

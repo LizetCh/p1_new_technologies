@@ -1,28 +1,42 @@
-CREATE SCHEMA IF NOT EXISTS harmonized;
+-- ============================================================
+-- Restaurants (Harmonized)
+-- ============================================================
 
-DROP TABLE IF EXISTS harmonized.restaurants;
-
--- Crear la tabla armonizada de restaurantes
-CREATE TABLE harmonized.restaurants (
-    restaurant_id VARCHAR(50) PRIMARY KEY,
-    cuisine VARCHAR(100) NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    rating NUMERIC(3, 2)
+CREATE TABLE IF NOT EXISTS harmonized.restaurants (
+    restaurant_id      VARCHAR(50),
+    restaurant_name    VARCHAR(150),
+    cuisine            VARCHAR(100),
+    city               VARCHAR(100),
+    rating             NUMERIC(3,2),
+    source_file        TEXT,
+    transformed_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO harmonized.restaurants (restaurant_id, cuisine, city, rating)
-SELECT 
-    restaurant_id,
-    cuisine,
-    city,
-    rating
-FROM raw.restaurants
-WHERE restaurant_id IS NOT NULL;
-
-
 -- ============================================================
--- Manual test
+-- Transformation procedure: Restaurants
 -- ============================================================
 
-SELECT COUNT(*) FROM raw.restaurants;
-Select * from harmonized.restaurants;
+CREATE OR REPLACE PROCEDURE automation.sp_transform_restaurants()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    TRUNCATE TABLE harmonized.restaurants;
+
+    INSERT INTO harmonized.restaurants (
+        restaurant_id,
+        restaurant_name,
+        cuisine,
+        city,
+        rating
+    )
+    SELECT
+        restaurant_id,
+        INITCAP(TRIM(restaurant_name)) AS restaurant_name,
+        INITCAP(TRIM(cuisine)) AS cuisine,
+        INITCAP(TRIM(city)) AS city,
+        NULLIF(rating::TEXT, '')::NUMERIC(3,2) AS rating
+    FROM raw.restaurants
+    WHERE restaurant_id IS NOT NULL;
+END;
+$$;
+
