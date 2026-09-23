@@ -258,6 +258,21 @@ else:
 
     st.dataframe(signups_by_month_df, use_container_width=True)
 
+    # --------- 5. Order Items Performance --------
+@st.cache_data(ttl=600)
+def load_order_items_performance() -> pd.DataFrame:
+    query = """
+        SELECT 
+            item_id, 
+            SUM(quantity) AS total_quantity, 
+            SUM(quantity * price) AS total_revenue
+        FROM harmonized.order_items
+        GROUP BY item_id;
+    """
+    logger.info("Loading data from harmonized.order_items")
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
+
 # ============================================================
 # Restaurant Summary Data Loading
 # ============================================================
@@ -301,3 +316,48 @@ else:
     
     st.plotly_chart(fig_restaurants, use_container_width=True)
     st.dataframe(restaurant_summary_df, use_container_width=True)
+
+# ============================================================
+# Order Items Analysis
+# ============================================================
+st.divider()
+st.subheader("Order Items Analysis")
+
+order_items_df = load_order_items_performance()
+
+if order_items_df.empty:
+    st.warning("No data available for order items. Run the pipeline first.")
+else:
+    # KPIs
+    col1, col2 = st.columns(2)
+    col1.metric("Ingresos Totales (Revenue)", f"${order_items_df['total_revenue'].sum():,.2f}")
+    col2.metric("Volumen Total de Ventas", f"{order_items_df['total_quantity'].sum():,} unidades")
+
+    st.write("") # Espaciador
+    
+    # Gráficas
+    col_chart1, col_chart2 = st.columns(2)
+
+    with col_chart1:
+        st.markdown("**Top 10 Artículos por Volumen**")
+        top_quantity = order_items_df.sort_values(by='total_quantity', ascending=False).head(10)
+        fig_qty = px.bar(
+            top_quantity, 
+            x='item_id', 
+            y='total_quantity', 
+            text_auto=True,
+            color_discrete_sequence=["#1f77b4"]
+        )
+        st.plotly_chart(fig_qty, use_container_width=True)
+
+    with col_chart2:
+        st.markdown("**Top 10 Artículos por Ingresos**")
+        top_revenue = order_items_df.sort_values(by='total_revenue', ascending=False).head(10)
+        fig_rev = px.bar(
+            top_revenue, 
+            x='item_id', 
+            y='total_revenue', 
+            text_auto=True,
+            color_discrete_sequence=["#ff7f0e"]
+        )
+        st.plotly_chart(fig_rev, use_container_width=True)
