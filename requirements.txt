@@ -1,3 +1,7 @@
 python-dotenv
 psycopg2-binary
 watchdog
+sqlalchemy
+pandas
+plotly
+streamlit
