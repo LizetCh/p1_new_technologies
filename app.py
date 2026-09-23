@@ -258,18 +258,18 @@ else:
 
     st.dataframe(signups_by_month_df, use_container_width=True)
 
-    # --------- 5. Order Items Performance --------
+   # --------- 5. Order Items Performance --------
 @st.cache_data(ttl=600)
 def load_order_items_performance() -> pd.DataFrame:
     query = """
         SELECT 
             item_id, 
-            SUM(quantity) AS total_quantity, 
-            SUM(quantity * price) AS total_revenue
-        FROM harmonized.order_items
-        GROUP BY item_id;
+            total_quantity, 
+            total_revenue
+        FROM analytics.vw_order_items_performance
+        ORDER BY total_revenue DESC;
     """
-    logger.info("Loading data from harmonized.order_items")
+    logger.info("Loading data from analytics.vw_order_items_performance")
     with engine.connect() as conn:
         return pd.read_sql(query, conn)
 

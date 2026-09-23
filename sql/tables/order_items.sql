@@ -32,3 +32,12 @@ BEGIN
     FROM raw.order_items;
 END;
 $$;
+
+--------- Vista para el Dashboard (Analytics) ---------
+CREATE OR REPLACE VIEW analytics.vw_order_items_performance AS
+SELECT 
+    item_id, 
+    SUM(quantity) AS total_quantity, 
+    SUM(quantity * price) AS total_revenue
+FROM harmonized.order_items
+GROUP BY item_id;
